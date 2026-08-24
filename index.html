@@ -4,8 +4,524 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Politeia UdeSA · Mail Assets</title>
+
+  <style>
+    :root {
+      --blue-dark: #254089;
+      --blue: #0061ab;
+      --green-dark: #1b9548;
+      --background: #f5f7fa;
+      --surface: #ffffff;
+      --text: #222831;
+      --muted: #65707d;
+      --border: #e2e7ee;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--background);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--blue-dark);
+      color: #ffffff;
+      padding: 34px 20px 30px;
+    }
+
+    .header-inner,
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      max-width: 760px;
+      font-size: 16px;
+      line-height: 1.55;
+      opacity: .92;
+    }
+
+    main {
+      padding: 28px 0 48px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .search {
+      flex: 1 1 340px;
+      min-width: 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 14px;
+      font-size: 16px;
+      background: var(--surface);
+      outline: none;
+    }
+
+    .search:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0, 97, 171, .12);
+    }
+
+    .count {
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .status {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 3px 12px rgba(22, 34, 48, .06);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .preview {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .preview img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .card-body {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .filename {
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    button,
+    .open-link {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .copy-button {
+      flex: 1;
+      background: var(--blue-dark);
+      color: #ffffff;
+    }
+
+    .copy-button:hover {
+      background: var(--blue);
+    }
+
+    .copy-button.copied {
+      background: var(--green-dark);
+    }
+
+    .open-link {
+      background: #ffffff;
+      color: var(--blue-dark);
+      border: 1px solid var(--border);
+    }
+
+    .empty {
+      grid-column: 1 / -1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    footer {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      padding: 0 16px 32px;
+    }
+  </style>
 </head>
+
 <body>
-  <p>Politeia UdeSA · Recursos gráficos para comunicaciones institucionales.</p>
+
+  <header>
+    <div class="header-inner">
+      <h1>Recursos para mails</h1>
+
+      <p class="subtitle">
+        Biblioteca de imágenes de Politeia UdeSA.
+        Subí el archivo al repositorio, esperá a que GitHub Pages actualice
+        y copiá desde acá el enlace público listo para usar en un mail HTML.
+      </p>
+    </div>
+  </header>
+
+  <main>
+
+    <div class="toolbar">
+      <input
+        id="search"
+        class="search"
+        type="search"
+        placeholder="Buscar por nombre de archivo…"
+        autocomplete="off"
+      >
+
+      <div id="count" class="count"></div>
+    </div>
+
+    <div id="status" class="status">
+      Cargando recursos…
+    </div>
+
+    <div id="grid" class="grid" hidden></div>
+
+  </main>
+
+  <footer>
+    Politeia UdeSA · Biblioteca de recursos gráficos para comunicaciones institucionales
+  </footer>
+
+  <script>
+
+    const owner = 'Politeia-UdeSA';
+    const repo = 'mail-assets';
+
+    const apiUrl =
+      `https://api.github.com/repos/${owner}/${repo}/contents/`;
+
+    const validExtensions = [
+      'png',
+      'jpg',
+      'jpeg',
+      'webp',
+      'gif'
+    ];
+
+    const grid = document.getElementById('grid');
+    const statusBox = document.getElementById('status');
+    const searchInput = document.getElementById('search');
+    const countBox = document.getElementById('count');
+
+    let files = [];
+
+    function getPublicUrl(fileName) {
+
+      const basePath =
+        window.location.pathname.endsWith('/')
+          ? window.location.pathname
+          : window.location.pathname.substring(
+              0,
+              window.location.pathname.lastIndexOf('/') + 1
+            );
+
+      return (
+        `${window.location.origin}` +
+        `${basePath}` +
+        `${encodeURIComponent(fileName)}`
+      );
+    }
+
+    function isImage(file) {
+
+      if (file.type !== 'file') {
+        return false;
+      }
+
+      const extension =
+        file.name.includes('.')
+          ? file.name.split('.').pop().toLowerCase()
+          : '';
+
+      return validExtensions.includes(extension);
+    }
+
+    async function copyText(text, button) {
+
+      try {
+
+        await navigator.clipboard.writeText(text);
+
+      } catch (error) {
+
+        const textarea =
+          document.createElement('textarea');
+
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+
+        document.body.appendChild(textarea);
+
+        textarea.focus();
+        textarea.select();
+
+        document.execCommand('copy');
+
+        textarea.remove();
+      }
+
+      const previous = button.textContent;
+
+      button.textContent = '¡Link copiado!';
+      button.classList.add('copied');
+
+      setTimeout(() => {
+
+        button.textContent = previous;
+        button.classList.remove('copied');
+
+      }, 1500);
+    }
+
+    function render() {
+
+      const term =
+        searchInput.value.trim().toLowerCase();
+
+      const visibleFiles =
+        files.filter(
+          file =>
+            file.name
+              .toLowerCase()
+              .includes(term)
+        );
+
+      grid.innerHTML = '';
+
+      countBox.textContent =
+        `${visibleFiles.length} recurso` +
+        `${visibleFiles.length === 1 ? '' : 's'}`;
+
+      if (!visibleFiles.length) {
+
+        const empty =
+          document.createElement('div');
+
+        empty.className = 'empty';
+
+        empty.textContent =
+          term
+            ? 'No hay recursos que coincidan con la búsqueda.'
+            : 'Todavía no hay imágenes cargadas en el repositorio.';
+
+        grid.appendChild(empty);
+
+        return;
+      }
+
+      visibleFiles.forEach(file => {
+
+        const publicUrl =
+          getPublicUrl(file.name);
+
+        const card =
+          document.createElement('article');
+
+        card.className = 'card';
+
+
+        const preview =
+          document.createElement('div');
+
+        preview.className = 'preview';
+
+
+        const img =
+          document.createElement('img');
+
+        img.src = publicUrl;
+        img.alt = file.name;
+        img.loading = 'lazy';
+
+        preview.appendChild(img);
+
+
+        const body =
+          document.createElement('div');
+
+        body.className = 'card-body';
+
+
+        const name =
+          document.createElement('div');
+
+        name.className = 'filename';
+        name.textContent = file.name;
+
+
+        const actions =
+          document.createElement('div');
+
+        actions.className = 'actions';
+
+
+        const copyButton =
+          document.createElement('button');
+
+        copyButton.type = 'button';
+        copyButton.className = 'copy-button';
+        copyButton.textContent = 'Copiar link';
+
+        copyButton.addEventListener(
+          'click',
+          () =>
+            copyText(
+              publicUrl,
+              copyButton
+            )
+        );
+
+
+        const openLink =
+          document.createElement('a');
+
+        openLink.className = 'open-link';
+        openLink.href = publicUrl;
+        openLink.target = '_blank';
+        openLink.rel = 'noopener noreferrer';
+        openLink.textContent = 'Abrir';
+
+
+        actions.append(
+          copyButton,
+          openLink
+        );
+
+        body.append(
+          name,
+          actions
+        );
+
+        card.append(
+          preview,
+          body
+        );
+
+        grid.appendChild(card);
+
+      });
+
+    }
+
+    async function loadFiles() {
+
+      try {
+
+        const response =
+          await fetch(apiUrl, {
+            headers: {
+              'Accept':
+                'application/vnd.github+json'
+            }
+          });
+
+        if (!response.ok) {
+          throw new Error(
+            `GitHub respondió ${response.status}`
+          );
+        }
+
+        const data =
+          await response.json();
+
+        files =
+          data
+            .filter(isImage)
+            .sort(
+              (a, b) =>
+                a.name.localeCompare(
+                  b.name,
+                  'es',
+                  {
+                    sensitivity: 'base'
+                  }
+                )
+            );
+
+        statusBox.hidden = true;
+        grid.hidden = false;
+
+        render();
+
+      } catch (error) {
+
+        statusBox.textContent =
+          'No se pudieron cargar los recursos. Probá actualizar la página en unos minutos.';
+
+        console.error(error);
+      }
+    }
+
+    searchInput.addEventListener(
+      'input',
+      render
+    );
+
+    loadFiles();
+
+  </script>
+
 </body>
 </html>
